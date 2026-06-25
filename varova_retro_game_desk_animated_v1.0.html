@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<title>Varova Strategy Game</title>
+
+<style>
+body {
+    margin:0;
+    background:black;
+    font-family:monospace;
+    color:#00ff00;
+}
+
+/* BACKGROUND */
+#bg {
+    width:100vw;
+    height:100vh;
+    background:url("desk.png") center/contain no-repeat;
+}
+
+/* ✅ SCREEN */
+#screen {
+    position:absolute;
+    top:32%;
+    left:50%;
+    transform:translateX(-50%);
+
+    width:32%;
+    height:26%;
+
+    min-width:520px;
+    min-height:300px;
+
+    background:black;
+    border:3px solid #00ff00;
+    padding:14px;
+    box-sizing:border-box;
+
+    display:flex;
+    flex-direction:column;
+}
+
+/* ✅ CRT overlay FIXED */
+#screen::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:repeating-linear-gradient(
+        transparent,
+        transparent 2px,
+        rgba(0,255,0,0.06) 2px,
+        rgba(0,255,0,0.06) 3px
+    );
+    pointer-events:none; /* 🔥 TÄRKEIN FIX */
+}
+
+/* ✅ TEXT */
+#text{
+    font-size:18px;
+    line-height:1.5;
+
+    height:60%;
+    overflow-y:auto;
+
+    margin-bottom:10px;
+}
+
+/* ✅ BUTTON AREA */
+#choices{
+    height:40%;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+}
+
+/* ✅ BUTTONS */
+#choices button{
+    width:100%;
+    padding:10px;
+    margin-top:6px;
+
+    font-size:16px;
+
+    border:2px solid #00ff00;
+    background:black;
+    color:#00ff00;
+
+    cursor:pointer;
+}
+
+#choices button:hover{
+    background:#003300;
+}
+</style>
+</head>
+
+<body>
+
+<div id="bg"></div>
+
+<div id="screen">
+    <div id="text"></div>
+    <div id="choices"></div>
+</div>
+
+<script>
+
+const text = document.getElementById("text");
+const choices = document.getElementById("choices");
+
+function render(msg, opts){
+    text.innerText = msg;
+    choices.innerHTML="";
+
+    opts.forEach(o=>{
+        const btn=document.createElement("button");
+        btn.innerText=o.text;
+        btn.onclick=o.action;
+        choices.appendChild(btn);
+    });
+}
+
+/* GAME */
+
+function start(){
+render(`EMAIL INBOX
+
+"Can you quote this shipment?"`,
+[
+{ text: "> Ask carriers", action: loseExecution },
+{ text: "> Use platform", action: marketplace },
+{ text: "> Estimate directly", action: loseExecution }
+]);
+}
+
+function marketplace(){
+render(`MARKET REALITY
+
+Everything is optimized:
+- pricing
+- capacity
+- booking
+
+Your role is disappearing.`,
+[
+{ text: "> Compete on price", action: loseCommodity },
+{ text: "> Join platform", action: loseSupplier },
+{ text: "> Move to orchestration", action: orchestration }
+]);
+}
+
+function orchestration(){
+render(`CUSTOMER CALL
+
+"What do you actually do for us?"`,
+[
+{ text: "> Provide transport", action: loseExecution },
+{ text: "> Provide options", action: loseExecution },
+{ text: "> Make decisions", action: exception }
+]);
+}
+
+function exception(){
+render(`CRITICAL EVENT
+
+Shipment disrupted.
+
+Customer needs action NOW.`,
+[
+{ text: "> Send tracking", action: loseExecution },
+{ text: "> Redirect to carrier", action: loseExecution },
+{ text: "> Take control & resolve", action: trust }
+]);
+}
+
+function trust(){
+render(`FINAL QUESTION
+
+If something fails again...
+
+who is responsible?`,
+[
+{ text: "> Platform", action: loseSupplier },
+{ text: "> Carrier", action: loseSupplier },
+{ text: "> Varova", action: win }
+]);
+}
+
+/* LOSSES */
+
+function loseExecution(){
+render(`GAME OVER
+
+You stayed in execution.
+
+→ replaceable`,
+[{ text: "> Restart", action:start }]);
+}
+
+function loseSupplier(){
+render(`GAME OVER
+
+You became supplier.
+
+→ no control
+→ no customer`,
+[{ text: "> Restart", action:start }]);
+}
+
+function loseCommodity(){
+render(`GAME OVER
+
+Price competition failed.
+
+→ margins collapse`,
+[{ text: "> Restart", action:start }]);
+}
+
+/* WIN */
+
+function win(){
+render(`SUCCESS
+
+You are:
+- Orchestrator
+- Data owner
+- Trust layer
+
+INSIGHT:
+
+You don’t win by moving cargo.
+
+You win by controlling decisions
+AND owning responsibility.`,
+[{ text: "> Play again", action:start }]);
+}
+
+start();
+
+</script>
+
+</body>
+</html>
+``
